@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"build": "mkdir build && cp src/index.html build/index.html && npx tsc src/conway.ts --outFile build/conway.js"
+		"build": "mkdir build; cp src/index.html build/index.html && npx tsc src/conway.ts --outFile build/conway.js"
 	},
   "devDependencies": {
     "typescript": "^5.2.2"
