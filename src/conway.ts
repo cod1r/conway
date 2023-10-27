@@ -7,10 +7,12 @@ const BUFFER_WIDTH = 100;
 const NODE_WIDTH = CANVAS_WIDTH / BUFFER_WIDTH;
 const NODE_HEIGHT = CANVAS_HEIGHT / BUFFER_HEIGHT;
 let bytes = new Uint8ClampedArray(BUFFER_HEIGHT * BUFFER_WIDTH * 3 /* times 3 because of RGB */);
+let bytes_used = new Uint8ClampedArray(BUFFER_HEIGHT * BUFFER_WIDTH * 3 /* times 3 because of RGB */);
 const DEAD = 1;
 const ALIVE = 0;
 for (let i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH * 3; ++i) {
 	bytes[i] = DEAD;
+	bytes_used[i] = DEAD;
 }
 main();
 function main() {
@@ -100,13 +102,13 @@ function apply_conway_rules() {
 				}
 			}
 			if (live_neighbors < 2 || live_neighbors > 3) {
-				bytes[(r * BUFFER_WIDTH * 3) + (c*3)] = DEAD;
-				bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 1] = DEAD;
-				bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 2] = DEAD;
+				bytes_used[(r * BUFFER_WIDTH * 3) + (c*3)] = DEAD;
+				bytes_used[(r * BUFFER_WIDTH * 3) + (c*3) + 1] = DEAD;
+				bytes_used[(r * BUFFER_WIDTH * 3) + (c*3) + 2] = DEAD;
 			} else if (live_neighbors == 3) {
-				bytes[(r * BUFFER_WIDTH * 3) + (c*3)] = ALIVE;
-				bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 1] = ALIVE;
-				bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 2] = ALIVE;
+				bytes_used[(r * BUFFER_WIDTH * 3) + (c*3)] = ALIVE;
+				bytes_used[(r * BUFFER_WIDTH * 3) + (c*3) + 1] = ALIVE;
+				bytes_used[(r * BUFFER_WIDTH * 3) + (c*3) + 2] = ALIVE;
 			}
 		}
 	}
@@ -115,13 +117,16 @@ function draw_bytes() {
 	ctx.clearRect(0, 0, cvs.width, cvs.height);
 	for (let r = 0; r < BUFFER_HEIGHT; ++r) {
 		for (let c = 0; c < BUFFER_WIDTH; ++c) {
-			let curr_first = bytes[(r * BUFFER_WIDTH * 3) + (c*3)];
-			let curr_second = bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 1];
-			let curr_third = bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 2];
+			let curr_first = bytes_used[(r * BUFFER_WIDTH * 3) + (c*3)];
+			let curr_second = bytes_used[(r * BUFFER_WIDTH * 3) + (c*3) + 1];
+			let curr_third = bytes_used[(r * BUFFER_WIDTH * 3) + (c*3) + 2];
 			ctx.beginPath();
 			ctx.fillStyle = `rgb(${curr_first * 255} ${curr_second * 255} ${curr_third * 255})`;
 			ctx.rect(c * NODE_WIDTH, r * NODE_HEIGHT, NODE_WIDTH, NODE_HEIGHT);
 			ctx.fill();
+			bytes[(r * BUFFER_WIDTH * 3) + (c*3)] = curr_first;
+			bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 1] = curr_second;
+			bytes[(r * BUFFER_WIDTH * 3) + (c*3) + 2] = curr_third;
 		}
 	}
 }
